@@ -1,0 +1,53 @@
+<html>
+    <head>
+        <title>
+            Tibia Sprite Extractor
+        </title>
+        <script src="Tibia.Spr.Parser.js"></script>
+    </head>
+    <body>
+        <input type="number" id="sprite-roller" min="0">
+        <input type="file" id="spr-input" name="file">
+
+        <canvas width="32" height="32"></canvas>
+    </body>
+    <script>
+        var input = document.getElementById('spr-input'),
+            canvas = document.getElementsByTagName('canvas')[0],
+            ctx = canvas.getContext('2d'),
+            parser = null;
+
+        input.onchange = function() {
+            parser = new Tibia.Spr.Parser(this.files[0]);
+
+            // Yes, we don't have event dispatchers yet.
+            // Feel free to contribute ;)
+            setTimeout(function() {
+                var roller = document.getElementById('sprite-roller');
+                roller.min = 0;
+                roller.max = parser.getNumberOfSprites();
+
+                roller.onchange = function() {
+                    var sprCoords = parser.getSpriteInfo(
+                                        parser.getSpritesAddresses()[this.value]
+                                    );
+                    ctx.fillStyle = 'rgb(255, 0, 255)';
+                    ctx.fillRect(0, 0, 32, 32);
+
+                    for (var i in sprCoords) {
+                        var coord = sprCoords[i];
+                        
+                        ctx.fillStyle = "rgba(:red, :green, :blue, :alpha)"
+                                        .replace(':red', coord.color.red)
+                                        .replace(':green', coord.color.green)
+                                        .replace(':blue', coord.color.blue)
+                                        .replace(':alpha', coord.color.alpha);
+
+                        ctx.fillRect(coord.x, coord.y, 1, 1);
+                    }
+                }
+
+            }, 1000)
+        };
+    </script>
+</html>
